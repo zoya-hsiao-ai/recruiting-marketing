@@ -8,28 +8,19 @@ type CategoryName = "Venue" | "Catering" | "Speakers" | "Travel" | "Swag";
 
 const COST_CENTERS: CostCenter[] = ["Marketing", "Recruiting", "Operations", "Executive"];
 
-// Applied Intuition palette — distinct but professional
 const CATEGORY_COLORS: Record<CategoryName, string> = {
   Venue:    "#006cfa",
   Catering: "#0891b2",
   Speakers: "#059669",
   Travel:   "#7c3aed",
-  Swag:     "#dc2626",
+  Swag:     "#e8198a",
 };
 
 const COST_CENTER_COLORS: Record<CostCenter, string> = {
   Marketing:  "#006cfa",
   Recruiting: "#059669",
-  Operations: "#272a30",
+  Operations: "#5a6072",
   Executive:  "#7c3aed",
-};
-
-const CATEGORY_ICONS: Record<CategoryName, string> = {
-  Venue:    "🏛️",
-  Catering: "🍽️",
-  Speakers: "🎤",
-  Travel:   "✈️",
-  Swag:     "🎁",
 };
 
 interface LineItem {
@@ -101,6 +92,8 @@ function parse(s: string) {
   return isNaN(n) ? 0 : n;
 }
 
+const IRIDESCENT = "linear-gradient(90deg, #006cfa 0%, #00b8d4 17%, #00c896 33%, #f0c800 50%, #ff5e1a 67%, #e8198a 83%, #8b33ea 100%)";
+
 export default function Home() {
   const [categories, setCategories] = useState<CategoriesState>(buildDefaults);
   const [collapsed, setCollapsed] = useState<Record<CategoryName, boolean>>(
@@ -167,74 +160,133 @@ export default function Home() {
   ) as Record<CostCenter, number>;
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--color-off-white)" }}>
-      {/* Header */}
+    <div className="min-h-screen" style={{ background: "var(--color-bg)" }}>
+      {/* Nav bar */}
       <header
         className="sticky top-0 z-10"
-        style={{
-          background: "var(--color-white)",
-          borderBottom: "1px solid var(--color-light-gray)",
-        }}
+        style={{ background: "var(--color-header)", position: "relative" }}
       >
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1
-              className="text-base font-semibold"
-              style={{ color: "var(--color-off-black)", letterSpacing: "var(--tracking-mid)" }}
+        {/* Iridescent accent stripe */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "2px",
+            background: IRIDESCENT,
+          }}
+        />
+
+        <div className="max-w-5xl mx-auto px-6 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            {/* Applied Intuition wordmark */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-white.png"
+              alt="Applied Intuition"
+              style={{ height: "17px", width: "auto" }}
+            />
+
+            <span
+              style={{
+                width: "1px",
+                height: "16px",
+                background: "rgba(255,255,255,0.15)",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+
+            <span
+              className="text-sm font-medium"
+              style={{ color: "rgba(255,255,255,0.6)", letterSpacing: "0.01em" }}
             >
               Conference Budget Calculator
-            </h1>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-5">
             <button
               onClick={() => setShowImport(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all"
               style={{
-                color: "var(--color-gray)",
-                border: "1px solid var(--color-light-gray)",
+                color: "rgba(255,255,255,0.45)",
+                border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: "var(--radius-sm)",
-                background: "var(--color-white)",
+                background: "transparent",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.color = "var(--color-off-black)";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-gray)";
+                (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.85)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.25)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.color = "var(--color-gray)";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-light-gray)";
+                (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.45)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.1)";
               }}
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               Import from Sheets
             </button>
-          </div>
-          <div className="text-right">
-            <div
-              className="text-xs font-medium uppercase mb-0.5"
-              style={{ color: "var(--color-gray)", letterSpacing: "0.06em" }}
-            >
-              Total Budget
-            </div>
-            <div
-              className="text-2xl font-semibold tabular-nums"
-              style={{ color: "var(--color-off-black)", letterSpacing: "var(--tracking-tight)" }}
-            >
-              {fmt(grandTotal)}
+
+            <div className="text-right">
+              <div
+                className="text-xs font-medium mb-0.5"
+                style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em", textTransform: "uppercase" }}
+              >
+                Total Budget
+              </div>
+              <div
+                className="text-xl font-semibold tabular-nums"
+                style={{ color: "#ffffff", letterSpacing: "var(--tracking-tight)", fontFamily: "appliedSansDisplay, ui-sans-serif" }}
+              >
+                {fmt(grandTotal)}
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+      {/* Hero banner */}
+      <div style={{ position: "relative", height: "220px", overflow: "hidden", background: "#0d1117" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/header-1.png"
+          alt=""
+          aria-hidden="true"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center 40%",
+            display: "block",
+          }}
+        />
+        {/* Bottom fade into body bg */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "80px",
+            background: "linear-gradient(to bottom, transparent, var(--color-bg))",
+          }}
+        />
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
         {/* Category input sections */}
         <div className="space-y-2">
           {CATEGORIES.map((cat) => (
             <div
               key={cat}
               style={{
-                background: "var(--color-white)",
-                border: "1px solid var(--color-light-gray)",
+                background: "var(--color-surface)",
                 borderRadius: "var(--radius-lg)",
+                boxShadow: "var(--shadow-md)",
                 overflow: "hidden",
               }}
             >
@@ -244,7 +296,7 @@ export default function Home() {
                 className="w-full flex items-center justify-between px-5 py-3.5 text-left transition-colors"
                 style={{ background: "transparent" }}
                 onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-off-white)")
+                  ((e.currentTarget as HTMLButtonElement).style.background = "var(--color-surface-raised)")
                 }
                 onMouseLeave={(e) =>
                   ((e.currentTarget as HTMLButtonElement).style.background = "transparent")
@@ -259,25 +311,25 @@ export default function Home() {
                     className="text-sm font-medium"
                     style={{ color: "var(--color-off-black)" }}
                   >
-                    {CATEGORY_ICONS[cat]} {cat}
+                    {cat}
                   </span>
                   <span
                     className="text-xs"
-                    style={{ color: "var(--color-gray)" }}
+                    style={{ color: "var(--color-mid-gray)" }}
                   >
                     {categories[cat].length} items
                   </span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span
-                    className="text-sm font-medium tabular-nums"
+                    className="text-sm font-semibold tabular-nums"
                     style={{ color: "var(--color-off-black)" }}
                   >
                     {fmt(categoryTotals[cat])}
                   </span>
                   <svg
                     className={`w-3.5 h-3.5 transition-transform duration-200 ${collapsed[cat] ? "" : "rotate-180"}`}
-                    style={{ color: "var(--color-gray)" }}
+                    style={{ color: "var(--color-mid-gray)" }}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -291,11 +343,14 @@ export default function Home() {
                   {/* Column labels */}
                   <div
                     className="px-5 py-2 grid grid-cols-[1fr_160px_160px_28px] gap-3"
-                    style={{ borderBottom: "1px solid var(--color-light-gray)" }}
+                    style={{
+                      borderBottom: "1px solid var(--color-light-gray)",
+                      background: "var(--color-surface-raised)",
+                    }}
                   >
-                    <span className="text-xs font-medium uppercase" style={{ color: "var(--color-gray)", letterSpacing: "0.06em" }}>Description</span>
-                    <span className="text-xs font-medium uppercase" style={{ color: "var(--color-gray)", letterSpacing: "0.06em" }}>Amount</span>
-                    <span className="text-xs font-medium uppercase" style={{ color: "var(--color-gray)", letterSpacing: "0.06em" }}>Cost Center</span>
+                    <span className="text-xs font-medium uppercase" style={{ color: "var(--color-mid-gray)", letterSpacing: "0.06em" }}>Description</span>
+                    <span className="text-xs font-medium uppercase" style={{ color: "var(--color-mid-gray)", letterSpacing: "0.06em" }}>Amount</span>
+                    <span className="text-xs font-medium uppercase" style={{ color: "var(--color-mid-gray)", letterSpacing: "0.06em" }}>Cost Center</span>
                     <span />
                   </div>
 
@@ -328,7 +383,7 @@ export default function Home() {
                       <div className="relative">
                         <span
                           className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm select-none"
-                          style={{ color: "var(--color-gray)" }}
+                          style={{ color: "var(--color-mid-gray)" }}
                         >
                           $
                         </span>
@@ -341,7 +396,7 @@ export default function Home() {
                           className="w-full text-sm pl-6 pr-3 py-1.5 tabular-nums focus:outline-none transition-colors"
                           style={{
                             color: "var(--color-off-black)",
-                            background: "var(--color-off-white)",
+                            background: "var(--color-surface-raised)",
                             border: "1px solid var(--color-light-gray)",
                             borderRadius: "var(--radius-sm)",
                           }}
@@ -359,7 +414,7 @@ export default function Home() {
                         className="text-sm px-2 py-1.5 focus:outline-none transition-colors cursor-pointer"
                         style={{
                           color: "var(--color-off-black)",
-                          background: "var(--color-off-white)",
+                          background: "var(--color-surface-raised)",
                           border: "1px solid var(--color-light-gray)",
                           borderRadius: "var(--radius-sm)",
                         }}
@@ -380,7 +435,7 @@ export default function Home() {
                         style={{ color: "var(--color-light-gray)", borderRadius: "var(--radius-sm)" }}
                         aria-label="Remove"
                         onMouseEnter={(e) =>
-                          ((e.currentTarget as HTMLButtonElement).style.color = "#dc2626")
+                          ((e.currentTarget as HTMLButtonElement).style.color = "#e8198a")
                         }
                         onMouseLeave={(e) =>
                           ((e.currentTarget as HTMLButtonElement).style.color = "var(--color-light-gray)")
@@ -400,12 +455,12 @@ export default function Home() {
                     <button
                       onClick={() => addItem(cat)}
                       className="flex items-center gap-1.5 text-sm transition-colors"
-                      style={{ color: "var(--color-gray)" }}
+                      style={{ color: "var(--color-mid-gray)" }}
                       onMouseEnter={(e) =>
                         ((e.currentTarget as HTMLButtonElement).style.color = "var(--color-applied-blue)")
                       }
                       onMouseLeave={(e) =>
-                        ((e.currentTarget as HTMLButtonElement).style.color = "var(--color-gray)")
+                        ((e.currentTarget as HTMLButtonElement).style.color = "var(--color-mid-gray)")
                       }
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -425,45 +480,45 @@ export default function Home() {
           {/* By Category */}
           <div
             style={{
-              background: "var(--color-white)",
-              border: "1px solid var(--color-light-gray)",
+              background: "var(--color-surface)",
               borderRadius: "var(--radius-lg)",
+              boxShadow: "var(--shadow-md)",
               padding: "1.5rem",
             }}
           >
             <h2
               className="text-xs font-semibold uppercase mb-5"
-              style={{ color: "var(--color-gray)", letterSpacing: "0.06em" }}
+              style={{ color: "var(--color-mid-gray)", letterSpacing: "0.08em" }}
             >
-              Breakdown by Category
+              By Category
             </h2>
             <div className="space-y-4">
               {CATEGORIES.map((cat) => {
                 const pct = grandTotal > 0 ? (categoryTotals[cat] / grandTotal) * 100 : 0;
                 return (
                   <div key={cat}>
-                    <div className="flex items-center justify-between text-sm mb-1.5">
+                    <div className="flex items-center justify-between text-sm mb-2">
                       <span className="flex items-center gap-2" style={{ color: "var(--color-dark-gray)" }}>
                         <span
-                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                           style={{ background: CATEGORY_COLORS[cat] }}
                         />
                         {cat}
                       </span>
                       <span className="tabular-nums" style={{ color: "var(--color-off-black)" }}>
                         {fmt(categoryTotals[cat])}
-                        <span className="ml-2 text-xs" style={{ color: "var(--color-gray)" }}>
+                        <span className="ml-2 text-xs" style={{ color: "var(--color-mid-gray)" }}>
                           {pct.toFixed(0)}%
                         </span>
                       </span>
                     </div>
                     <div
-                      className="h-1 rounded-full overflow-hidden"
-                      style={{ background: "var(--color-off-white)" }}
+                      className="h-1.5 rounded-full overflow-hidden"
+                      style={{ background: "var(--color-light-gray)" }}
                     >
                       <div
                         className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%`, background: CATEGORY_COLORS[cat] }}
+                        style={{ width: `${pct}%`, background: IRIDESCENT }}
                       />
                     </div>
                   </div>
@@ -485,45 +540,45 @@ export default function Home() {
           {/* By Cost Center */}
           <div
             style={{
-              background: "var(--color-white)",
-              border: "1px solid var(--color-light-gray)",
+              background: "var(--color-surface)",
               borderRadius: "var(--radius-lg)",
+              boxShadow: "var(--shadow-md)",
               padding: "1.5rem",
             }}
           >
             <h2
               className="text-xs font-semibold uppercase mb-5"
-              style={{ color: "var(--color-gray)", letterSpacing: "0.06em" }}
+              style={{ color: "var(--color-mid-gray)", letterSpacing: "0.08em" }}
             >
-              Breakdown by Cost Center
+              By Cost Center
             </h2>
             <div className="space-y-4">
               {COST_CENTERS.map((cc) => {
                 const pct = grandTotal > 0 ? (costCenterTotals[cc] / grandTotal) * 100 : 0;
                 return (
                   <div key={cc}>
-                    <div className="flex items-center justify-between text-sm mb-1.5">
+                    <div className="flex items-center justify-between text-sm mb-2">
                       <span className="flex items-center gap-2" style={{ color: "var(--color-dark-gray)" }}>
                         <span
-                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                           style={{ background: COST_CENTER_COLORS[cc] }}
                         />
                         {cc}
                       </span>
                       <span className="tabular-nums" style={{ color: "var(--color-off-black)" }}>
                         {fmt(costCenterTotals[cc])}
-                        <span className="ml-2 text-xs" style={{ color: "var(--color-gray)" }}>
+                        <span className="ml-2 text-xs" style={{ color: "var(--color-mid-gray)" }}>
                           {pct.toFixed(0)}%
                         </span>
                       </span>
                     </div>
                     <div
-                      className="h-1 rounded-full overflow-hidden"
-                      style={{ background: "var(--color-off-white)" }}
+                      className="h-1.5 rounded-full overflow-hidden"
+                      style={{ background: "var(--color-light-gray)" }}
                     >
                       <div
                         className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%`, background: COST_CENTER_COLORS[cc] }}
+                        style={{ width: `${pct}%`, background: IRIDESCENT }}
                       />
                     </div>
                   </div>

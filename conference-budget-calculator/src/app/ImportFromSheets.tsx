@@ -300,9 +300,9 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
       <div
         className="relative w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col shadow-xl"
         style={{
-          background: "var(--color-white)",
-          border: "1px solid var(--color-light-gray)",
+          background: "var(--color-surface)",
           borderRadius: "var(--radius-lg)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.08)",
         }}
       >
         {/* Header */}
@@ -339,8 +339,8 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                 <div
                   className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium transition-colors"
                   style={{
-                    background: done ? "#059669" : active ? "var(--color-off-black)" : "var(--color-off-white)",
-                    color: done || active ? "var(--color-white)" : "var(--color-gray)",
+                    background: done ? "#059669" : active ? "var(--color-off-black)" : "var(--color-surface-raised)",
+                    color: done || active ? "#ffffff" : "var(--color-gray)",
                     border: `1px solid ${done ? "#059669" : active ? "var(--color-off-black)" : "var(--color-light-gray)"}`,
                   }}
                 >
@@ -390,7 +390,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                   <div
                     className="w-14 h-14 flex items-center justify-center text-2xl"
                     style={{
-                      background: "var(--color-off-white)",
+                      background: "var(--color-surface-raised)",
                       border: "1px solid var(--color-light-gray)",
                       borderRadius: "var(--radius-lg)",
                     }}
@@ -411,7 +411,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                     className="px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                     style={{
                       background: "var(--color-off-black)",
-                      color: "var(--color-white)",
+                      color: "#ffffff",
                       borderRadius: "var(--radius-sm)",
                     }}
                   >
@@ -439,7 +439,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                   placeholder="https://docs.google.com/spreadsheets/d/..."
                   className="w-full text-sm px-3 py-2 focus:outline-none transition-colors"
                   style={{
-                    background: "var(--color-off-white)",
+                    background: "var(--color-surface-raised)",
                     border: "1px solid var(--color-light-gray)",
                     borderRadius: "var(--radius-sm)",
                     color: "var(--color-off-black)",
@@ -455,7 +455,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                 className="self-start px-4 py-2 text-sm font-medium transition-colors disabled:opacity-40"
                 style={{
                   background: "var(--color-off-black)",
-                  color: "var(--color-white)",
+                  color: "#ffffff",
                   borderRadius: "var(--radius-sm)",
                 }}
               >
@@ -481,8 +481,8 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                       onClick={() => setSelectedSheet(name)}
                       className="px-3 py-2 text-sm font-medium text-left transition-colors"
                       style={{
-                        background: selectedSheet === name ? "var(--color-off-black)" : "var(--color-off-white)",
-                        color: selectedSheet === name ? "var(--color-white)" : "var(--color-dark-gray)",
+                        background: selectedSheet === name ? "var(--color-off-black)" : "var(--color-surface-raised)",
+                        color: selectedSheet === name ? "#ffffff" : "var(--color-dark-gray)",
                         border: `1px solid ${selectedSheet === name ? "var(--color-off-black)" : "var(--color-light-gray)"}`,
                         borderRadius: "var(--radius-sm)",
                       }}
@@ -498,7 +498,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                 className="self-start px-4 py-2 text-sm font-medium transition-colors disabled:opacity-40"
                 style={{
                   background: "var(--color-off-black)",
-                  color: "var(--color-white)",
+                  color: "#ffffff",
                   borderRadius: "var(--radius-sm)",
                 }}
               >
@@ -537,7 +537,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                 <div
                   className="grid grid-cols-[auto_1fr_90px_120px_120px] gap-2 px-3 py-2 text-xs font-medium uppercase"
                   style={{
-                    background: "var(--color-off-white)",
+                    background: "var(--color-surface-raised)",
                     color: "var(--color-gray)",
                     letterSpacing: "0.06em",
                     borderBottom: "1px solid var(--color-light-gray)",
@@ -556,7 +556,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                       row.selected ? "" : "opacity-40"
                     }`}
                     style={{
-                      borderTop: idx === 0 ? "none" : "1px solid var(--color-off-white)",
+                      borderTop: idx === 0 ? "none" : "1px solid var(--color-surface-raised)",
                     }}
                   >
                     <input
@@ -574,7 +574,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                       onChange={(e) => updateRowField(row.id, "category", e.target.value)}
                       className="text-xs px-1.5 py-1 focus:outline-none"
                       style={{
-                        background: "var(--color-off-white)",
+                        background: "var(--color-surface-raised)",
                         border: "1px solid var(--color-light-gray)",
                         borderRadius: "var(--radius-sm)",
                         color: "var(--color-off-black)",
@@ -587,7 +587,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
                       onChange={(e) => updateRowField(row.id, "costCenter", e.target.value)}
                       className="text-xs px-1.5 py-1 focus:outline-none"
                       style={{
-                        background: "var(--color-off-white)",
+                        background: "var(--color-surface-raised)",
                         border: "1px solid var(--color-light-gray)",
                         borderRadius: "var(--radius-sm)",
                         color: "var(--color-off-black)",
@@ -623,7 +623,7 @@ export default function ImportFromSheets({ requestToken, onImport, onClose }: Pr
               className="px-4 py-2 text-sm font-medium transition-colors disabled:opacity-40"
               style={{
                 background: "var(--color-applied-blue)",
-                color: "var(--color-white)",
+                color: "#ffffff",
                 borderRadius: "var(--radius-sm)",
               }}
             >
