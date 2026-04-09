@@ -1,0 +1,9 @@
+name = "conference-dri-hub"
+
+# Enable API Gateway so other internal apps can call our endpoints too
+enable_api_gateway = true
+api_gateway_paths = ["/api/{path=**}"]
+
+[metadata]
+owner = "zoya.hsiao@applied.co"
+description = "Conference planning and tracking hub for recruiting — manages action items, attendees, booth ops, budget, and candidate pipeline."

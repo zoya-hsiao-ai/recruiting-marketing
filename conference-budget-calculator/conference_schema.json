@@ -1,0 +1,574 @@
+{
+  "$schema_description": "Conference DRI Hub — Data Schema and Sample Data. This file defines the complete data model and includes sample data seeded from real CVPR 2026 and ICCV 2025 conference trackers at Applied Intuition.",
+
+  "type_definitions": {
+    "Conference": {
+      "id": "string — kebab-case unique identifier (e.g. 'cvpr-2026')",
+      "name": "string — display name (e.g. 'CVPR 2026')",
+      "location": "string — city and state/country",
+      "dates": "string — human-readable date range",
+      "niche": "string — the domain/community this conference serves",
+      "status": "enum: 'planning' | 'active' | 'completed'",
+      "hasBooth": "boolean",
+      "hasPrivateEvent": "boolean",
+      "privateEventName": "string — name of the private event if applicable",
+      "strategy": "Strategy",
+      "attendees": "Attendee[]",
+      "booth": "Booth",
+      "privateEvent": "PrivateEvent",
+      "candidates": "Candidate[]",
+      "budget": "Budget",
+      "actionItems": "Record<string, ActionItem[]> — keys are phase names, values are arrays of tasks"
+    },
+
+    "Strategy": {
+      "goals": "string — what the company aims to achieve at this conference",
+      "targetProfiles": "string — who we want to meet/source",
+      "keyMessages": "string — talking points and positioning for booth and conversations",
+      "successMetrics": "string — how we measure whether this conference was worth it"
+    },
+
+    "Attendee": {
+      "id": "string — unique identifier",
+      "name": "string",
+      "team": "string — e.g. 'Onroad/Perception', 'AI Research', 'AI Research/E2E', 'Offroad', 'Recruiting Program Management'",
+      "dates": "string — travel date range",
+      "hotelNights": "number",
+      "confirmed": "enum: 'checking' | 'confirmed' — color-coded yellow/green",
+      "ieeeMemberNumber": "string — IEEE membership number (relevant for IEEE conferences)",
+      "tshirtSize": "enum: 'S' | 'M' | 'L' | 'XL' | 'XXL' | ''",
+      "foodPreference": "string — e.g. 'N/A', 'Vegetarian', 'Vegan'",
+      "conferenceRegistered": "boolean — whether early bird / standard registration is complete",
+      "conferenceConfirmationNumber": "string",
+      "hotelBooked": "boolean",
+      "hotelBookingNote": "string — e.g. '3 nights; June 4 - June 7th'",
+      "hotelConfirmationNumber": "string",
+      "hotelTotalCost": "number — dollar amount",
+      "flightsBooked": "boolean",
+      "flightTotalCost": "number — dollar amount",
+      "flightInfoOutbound": "string — e.g. 'SJC/SFO → DEN'",
+      "flightInfoReturn": "string — e.g. 'DEN → HNL'",
+      "notes": "string"
+    },
+
+    "Booth": {
+      "size": "string — e.g. '10x10'",
+      "design": {
+        "status": "enum: 'not_started' | 'in_progress' | 'review' | 'approved' | 'submitted'",
+        "deadline": "string — date",
+        "notes": "string"
+      },
+      "materials": "BoothMaterial[] — items to pack/ship with checkbox tracking",
+      "shipping": {
+        "status": "enum: 'not_started' | 'packed' | 'shipped' | 'delivered'",
+        "deadline": "string",
+        "carrier": "string — e.g. 'Freeman'",
+        "tracking": "string"
+      },
+      "shifts": "BoothShiftDay[] — the booth staffing schedule organized by day"
+    },
+
+    "BoothMaterial": {
+      "item": "string — e.g. 'Demo laptop(s)', 'Booth banner/backdrop'",
+      "packed": "boolean"
+    },
+
+    "BoothShiftDay": {
+      "date": "string — e.g. 'Tuesday, October 21st'",
+      "slots": "BoothShiftSlot[]"
+    },
+
+    "BoothShiftSlot": {
+      "time": "string — e.g. '11:30 AM - 1:00 PM'",
+      "isSpecialEvent": "boolean — if true, this row is highlighted (e.g. BREAKFAST)",
+      "specialEventLabel": "string — e.g. 'BREAKFAST' (only used if isSpecialEvent is true)",
+      "boothers": "string[] — array of 3-4 names assigned to this shift"
+    },
+
+    "PrivateEvent": {
+      "venue": "string",
+      "capacity": "string",
+      "catering": "string",
+      "invitesSent": "boolean",
+      "inviteDeadline": "string",
+      "rsvpCount": "number",
+      "notes": "string"
+    },
+
+    "Candidate": {
+      "id": "string — unique identifier",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "string",
+      "linkedin": "string — URL",
+      "inviteToInterview": "enum: 'yes' | 'no' | 'tbd' — color-coded green/red/yellow",
+      "notes": "string — screening rationale, conversation notes, fit assessment",
+      "company": "string — current employer",
+      "school": "string — university affiliation",
+      "reason": "string — why flagged (research area, referral, etc.)",
+      "phoneNumber": "string",
+      "location": "string",
+      "atsLink": "string — URL to Greenhouse/Ashby profile",
+      "addedToAts": "boolean",
+      "source": "enum: 'booth_conversation' | 'breakfast_attendee' | 'pre_conference_outreach' | 'paper_author' | 'scanner' | 'referral' | 'other'",
+      "addedBy": "string — who logged this candidate",
+      "dateAdded": "string — ISO datetime"
+    },
+
+    "Budget": {
+      "headcount": "BudgetHeadcount — department headcount driving per-person cost calculations",
+      "lineItems": "BudgetLineItem[] — the detailed line-by-line budget",
+      "summary": "BudgetSummaryItem[] — rolled-up category totals (auto-calculated or manually entered)",
+      "teamSpend": "TeamSpendItem[] — per-person or per-department spend breakdown with owner names"
+    },
+
+    "BudgetHeadcount": {
+      "recruiting": "number",
+      "research": "number",
+      "engineering": "number",
+      "marketing": "number — sometimes 0 if Marketing doesn't send attendees",
+      "total": "number — computed sum"
+    },
+
+    "BudgetLineItem": {
+      "dateOfSpend": "string — date when cost is incurred (e.g. '3/4/2026', '4/7/2026')",
+      "item": "string — description of the expense",
+      "source": "string — payment method or vendor (e.g. 'Ramp Card', 'Freeman', 'Navan', 'Hotel Venue')",
+      "costPerUnit": "number — cost per person or per item",
+      "quantity": "number — number of units (people, nights, items, etc.)",
+      "totalCost": "number — costPerUnit × quantity (or manual override)",
+      "actualSpend": "number — what was actually spent (filled in post-event)",
+      "notes": "string — critical context like 'Quantity is # of people x # of nights; Respective attendee's team is cost center' or '$359 for first license, $99 for second, $458 total' or '50/50 split between Recruiting/Marketing'"
+    },
+
+    "BudgetSummaryItem": {
+      "category": "string — e.g. 'Cost per person', 'Conference Sponsorship', 'Breakfast Event', 'Swag', 'Booth', 'Buffer Placeholder'",
+      "projectedCost": "number",
+      "actualSpend": "number",
+      "notes": "string — e.g. 'Paid for by respective cost center of each attendee', 'Research pays', '50/50 split between Recruiting/Marketing'"
+    },
+
+    "TeamSpendItem": {
+      "owner": "string — person's name who owns this budget line (e.g. 'Wei Zhan', 'Eitan Sheer')",
+      "label": "string — e.g. 'Total Research Spend', 'Total Eng Spend', 'Total Recruiting Spend', 'Total Marketing Spend'",
+      "projectedCost": "number",
+      "actualSpend": "number",
+      "notes": "string — e.g. 'Cost to send each attendee (flights, hotels, transportation, food, conference registration)', 'Breakfast event, 50/50 split with Marketing on conference booth and swag'"
+    },
+
+    "ActionItem": {
+      "id": "string — unique identifier",
+      "status": "enum: 'not_started' | 'in_progress' | 'completed'",
+      "dueDate": "string — date (YYYY-MM-DD or human-readable)",
+      "dri": "string — name of person responsible",
+      "task": "string — description of the action item",
+      "notes": "string — detailed context, dependencies, instructions, handoff info",
+      "estimatedTime": "string — e.g. 'Lauren = 6 hours', 'Recruiting: 2 hours', '30 minutes with Arturo'"
+    }
+  },
+
+  "default_action_items_template": {
+    "_description": "Every new conference is initialized with these phases and action items. Users can add/remove/reorder.",
+    "Pre-Conference Setup": [
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Draft conference proposal", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Put together conference budget estimate", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Work with Finance to get conference ramp card", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Work with Finance to get onboarded onto expense platform", "notes": "e.g. Coupa", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Reserve all hotel blocks", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Share T&C legal updates with legal team", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Send T&C updates to Legal", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Register conference attendees", "notes": "Check early bird pricing deadline", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Confirm booth space with conference", "notes": "", "estimatedTime": "" }
+    ],
+    "Content & Outreach Prep": [
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Identify relevant papers and research to reference in outreach", "notes": "Steps: verify keywords with research team, feed ~2500 papers into ChatGPT/Claude/Cursor to identify papers, then prompt engineering to double check and prevent errors", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Create event RSVP form (Gem/Google Form)", "notes": "", "estimatedTime": "1 hour" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Prioritize papers and authors for pre-conference outreach", "notes": "Split between team members for review", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Create fake email accounts for outreach aliases", "notes": "NOT aliases like last time — one for me to send bulk messages and an interest form for the breakfast. Could be worth sending out an interest form for the breakfast as well.", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Create/edit pre-conference outreach Gem sequences", "notes": "Two kinds: breakfast invite + booth awareness. No difference between P0 and P1 outreaches, too much administrative thrash.", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Finalize flyer copy and hand off to Design", "notes": "Can reuse the one from CVPR with some modifications", "estimatedTime": "Recruiting: 2 hours" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Complete booth build design and hand off to Design", "notes": "Complete 10x10 booth build design", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Create a social media strategy with Marketing", "notes": "", "estimatedTime": "Recruiting/Marketing: 2 hours" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Create a script to cross-reference authors with attendee list to find contact info", "notes": "", "estimatedTime": "Recruiting/Eng: 1-2 hours" }
+    ],
+    "Logistics & Coordination": [
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Get attendee list from conference organizer", "notes": "As a sponsor, we get a list of names and emails of attendees that we use for pre-conference outreach", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Schedule pre-conference trainings for attendees", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Block off all calendars with relevant details, links, talking points", "notes": "Need to set up a training session. Might try to do most of it async and re-use the recordings.", "estimatedTime": "Recruiting: 1 hour" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Get service account from vendor for conference email", "notes": "e.g. iccv2025@applied.co", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Finalize Gem/Google form for private event RSVP", "notes": "Waiting on vendor to answer a question about confirmation emails before sending out", "estimatedTime": "Lauren = 2 hours" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Upload candidate list to Gem and categorize by project", "notes": "", "estimatedTime": "Lauren = 30 mins" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Send breakfast interest sequence", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Create and post job board requisitions on conference careers site", "notes": "Once published, put the link in the conference channel and tag DRI, going to print", "estimatedTime": "Lauren = 1 hour" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Get scanning app set up for lead capture at booth", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Collaborate with Design on private event invitation graphic", "notes": "Can reuse the one from CVPR with some modifications", "estimatedTime": "Recruiting: 1 hour" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Find contact info for top-priority authors using the attendee list", "notes": "Contingent on if we can access the resume book in advance of the conference. We will only need to find verifiable contact info for P0-P1 candidates that we want to invite to the breakfast event in advance (huge time savings). For everyone else, we can mass outreach from the resume book asking them to attend the booth.", "estimatedTime": "Lauren/Stack = 4-8 hours" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Send mass outreach sequence to all attendees", "notes": "Now have figured out how to send. Waiting to send until we have the conference job posting live to link in the sequence. Also, CHANGE THE LINK IN THE BREAKFAST SEQUENCES FOR CAREERS PAGE LINK.", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Manually remove people from breakfast interest sequence if they fill out the form", "notes": "If they reply back, it will stop automatically, but I'll need to stop the sequence manually if only the form is filled out, to my knowledge", "estimatedTime": "Lauren = 1 hour/week" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Budget time to respond to email responses", "notes": "For P0 candidates, setting them up for on-prem chats with Wei, Yihan, Vickram + senior team", "estimatedTime": "6-8 hours" }
+    ],
+    "Event Week": [
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Confirm freight delivery and booth materials arrived", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Booth setup and walkthrough", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Distribute booth staff schedule and shift reminders", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Private event setup and vendor check-in", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Run daily attendee debrief and lead capture sync", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Capture photos and content for social / employer brand", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Execute sourcing conversations on the floor", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Monitor RSVP list and manage walk-ins at private event", "notes": "", "estimatedTime": "" }
+    ],
+    "Post-Conference": [
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Send mass outreach sequence to all booth leads", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Manually manage breakfast interest form responses", "notes": "Stop sequences for RSVPs", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Upload all leads to Ashby with conference source tag", "notes": "e.g. 'Conference - CVPR' or 'Conference - ICCV'", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Send follow-up emails to all captured leads within 48 hours", "notes": "Confirmation email for folks we definitely invite. Email letting some folks know we can't accommodate them. Email following up with folks who attended the breakfast afterwards to thank them + ask some specific folks to interview. Email following up with everyone we talked to at the booth to send careers page + resources (general).", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Debrief with team — what worked, what didn't", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Post event recap on internal Slack (wins, metrics, photos)", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Reconcile actuals vs. budget", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Publish social content / blog post if applicable", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Track pipeline conversion at 30/60/90 days", "notes": "", "estimatedTime": "" },
+      { "status": "not_started", "dueDate": "", "dri": "", "task": "Conference Job Board opens (if applicable)", "notes": "", "estimatedTime": "" }
+    ]
+  },
+
+  "default_budget_line_items": [
+    { "dateOfSpend": "", "item": "Hotel Room for 1 person/night @ Hotel", "source": "Ramp Card", "costPerUnit": 300, "quantity": 0, "totalCost": 0, "actualSpend": 0, "notes": "Quantity is # of people x # of nights; Respective attendee's team is cost center" },
+    { "dateOfSpend": "", "item": "Flight for 1 person roundtrip", "source": "Navan", "costPerUnit": 450, "quantity": 0, "totalCost": 0, "actualSpend": 0, "notes": "Quantity is # of people; Respective attendee's team is cost center" },
+    { "dateOfSpend": "", "item": "Local Transportation roundtrip", "source": "Ramp Reimbursement", "costPerUnit": 80, "quantity": 0, "totalCost": 0, "actualSpend": 0, "notes": "Quantity is # of people; Respective attendee's team is cost center" },
+    { "dateOfSpend": "", "item": "Meals and Incidentals per person", "source": "Ramp Reimbursement", "costPerUnit": 300, "quantity": 0, "totalCost": 0, "actualSpend": 0, "notes": "Quantity is # of people x $60/person/day; Respective attendee's team is cost center" },
+    { "dateOfSpend": "", "item": "Conference Booth Space Registration", "source": "Ramp Card", "costPerUnit": 0, "quantity": 1, "totalCost": 0, "actualSpend": 0, "notes": "Cost is $/sq ft; 50/50 split between Recruiting/Marketing" },
+    { "dateOfSpend": "", "item": "Conference Sponsorship", "source": "Ramp Card", "costPerUnit": 0, "quantity": 1, "totalCost": 0, "actualSpend": 0, "notes": "Research pays (if Silver/Gold level)" },
+    { "dateOfSpend": "", "item": "Conference Registration (Full/Passport)", "source": "Ramp Card", "costPerUnit": 750, "quantity": 0, "totalCost": 0, "actualSpend": 0, "notes": "Respective attendee's team is cost center" },
+    { "dateOfSpend": "", "item": "10x10 Booth Build", "source": "Freeman", "costPerUnit": 0, "quantity": 1, "totalCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; 10 x 10 Booth includes TV" },
+    { "dateOfSpend": "", "item": "10x10 Booth Build A/V", "source": "Freeman", "costPerUnit": 0, "quantity": 1, "totalCost": 0, "actualSpend": 0, "notes": "" },
+    { "dateOfSpend": "", "item": "Booth Exhibit Staff Registration", "source": "Ramp Card", "costPerUnit": 75, "quantity": 0, "totalCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; Contact at booth build vendor, likely Freeman" },
+    { "dateOfSpend": "", "item": "Booth Badge Scanners", "source": "Freeman", "costPerUnit": 0, "quantity": 0, "totalCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; $359 for first license, $99 for second, $458 total" },
+    { "dateOfSpend": "", "item": "Booth Fliers", "source": "Ramp Card", "costPerUnit": 0, "quantity": 1000, "totalCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; Booth fliers quote from Dynamite Digital for a 5 x 7 card; this includes tax and shipping" },
+    { "dateOfSpend": "", "item": "Breakfast Event Invitations", "source": "Ramp Card", "costPerUnit": 0, "quantity": 300, "totalCost": 0, "actualSpend": 0, "notes": "Recruiting pays; Breakfast event invitations quote from FedEx; this includes tax, would have to pick up" },
+    { "dateOfSpend": "", "item": "Breakfast Event Venue", "source": "Hotel Venue", "costPerUnit": 680, "quantity": 2, "totalCost": 0, "actualSpend": 0, "notes": "Recruiting pays; Quantity is for 2 half-days" },
+    { "dateOfSpend": "", "item": "Breakfast Event Food Order", "source": "Hotel Venue", "costPerUnit": 70, "quantity": 80, "totalCost": 0, "actualSpend": 0, "notes": "Recruiting pays; Quantity is for 40 people for 2 breakfast events, so 80 people total" },
+    { "dateOfSpend": "", "item": "Swag: TBD (waiting on Marketing rebrand)", "source": "Ramp Card", "costPerUnit": 0, "quantity": 600, "totalCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; Swag has not be determined yet, this is an estimate from previous swag (foldable tote bags)" },
+    { "dateOfSpend": "", "item": "Swag: Applied stickers", "source": "Ramp Card", "costPerUnit": 0.27, "quantity": 1000, "totalCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; Swag has not be determined yet, this is an estimate from previous stickers" },
+    { "dateOfSpend": "", "item": "General incidentals, taxes, fees, shipping costs", "source": "Ramp Card", "costPerUnit": 10000, "quantity": 1, "totalCost": 10000, "actualSpend": 0, "notes": "Buffer" }
+  ],
+
+  "default_budget_summary": [
+    { "category": "Cost per person", "projectedCost": 0, "actualSpend": 0, "notes": "This includes: Hotel, flights, transportation, meals/incidentals, conference registration. Paid for by respective cost center of each attendee." },
+    { "category": "Conference Sponsorship", "projectedCost": 0, "actualSpend": 0, "notes": "Research pays" },
+    { "category": "Breakfast Event", "projectedCost": 0, "actualSpend": 0, "notes": "Recruiting pays" },
+    { "category": "Swag", "projectedCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing" },
+    { "category": "Booth", "projectedCost": 0, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing" },
+    { "category": "Buffer Placeholder", "projectedCost": 10000, "actualSpend": 0, "notes": "" }
+  ],
+
+  "default_team_spend": [
+    { "owner": "", "label": "Total Research Spend", "projectedCost": 0, "actualSpend": 0, "notes": "Conference Sponsorship" },
+    { "owner": "", "label": "Total Eng Spend", "projectedCost": 0, "actualSpend": 0, "notes": "Cost to send each attendee (flights, hotels, transportation, food, conference registration)" },
+    { "owner": "", "label": "Total Recruiting Spend", "projectedCost": 0, "actualSpend": 0, "notes": "Breakfast event, 50/50 split with Marketing on conference booth and swag" },
+    { "owner": "", "label": "Total Marketing Spend", "projectedCost": 0, "actualSpend": 0, "notes": "50/50 split with Recruiting on conference booth and swag" },
+    { "owner": "", "label": "Buffer Placeholder", "projectedCost": 10000, "actualSpend": 0, "notes": "" }
+  ],
+
+  "default_booth_materials": [
+    { "item": "Demo laptop(s)", "packed": false },
+    { "item": "Booth banner / backdrop", "packed": false },
+    { "item": "Tablecloth with branding", "packed": false },
+    { "item": "Booth flyers", "packed": false },
+    { "item": "Breakfast invite cards / printables", "packed": false },
+    { "item": "Swag items (t-shirts, totes, etc.)", "packed": false },
+    { "item": "Business cards", "packed": false },
+    { "item": "Lead capture device / tablet", "packed": false },
+    { "item": "Scanning app device", "packed": false },
+    { "item": "Extension cords / power strips", "packed": false },
+    { "item": "Signage / wayfinding", "packed": false },
+    { "item": "Banners", "packed": false }
+  ],
+
+  "sample_data": [
+    {
+      "id": "cvpr-2026",
+      "name": "CVPR 2026",
+      "location": "Denver, CO",
+      "dates": "June 5–8, 2026",
+      "niche": "Computer Vision / AI Research",
+      "status": "active",
+      "hasBooth": true,
+      "hasPrivateEvent": true,
+      "privateEventName": "Breakfast Events (Day 1 & Day 2)",
+      "strategy": {
+        "goals": "Build Applied Intuition's talent brand in the AI research community, particularly in niche domains like computer vision. Convert high-quality research talent into active candidates. Increase Applied's visibility as a destination employer for researchers working on world foundation models, perception, and physical AI.",
+        "targetProfiles": "Senior researchers, PhD candidates, and postdocs in computer vision, machine learning, robotics, and autonomous systems. Senior ICs at competing AV/AI companies. Faculty and lab leads who influence where their students go.",
+        "keyMessages": "Physical AI — where everything that moves becomes intelligent. Applied's autonomy stack goes beyond chatbots into safety-critical systems. World Foundation Models are the next chapter after LLMs. You can't vibe code a 100-ton truck — the bar for physical AI is fundamentally higher.",
+        "successMetrics": "Number of qualified leads sourced at conference. Breakfast event RSVP count and attendance rate. Post-event survey scores. Pipeline conversion rate at 30/60/90 days. Number of follow-up conversations booked on-site. Social content impressions from conference presence."
+      },
+      "attendees": [
+        {
+          "id": "att-1",
+          "name": "Zoya Hsiao",
+          "team": "Recruiting Program Management",
+          "dates": "",
+          "hotelNights": 3,
+          "confirmed": "confirmed",
+          "ieeeMemberNumber": "",
+          "tshirtSize": "S",
+          "foodPreference": "N/A",
+          "conferenceRegistered": true,
+          "conferenceConfirmationNumber": "GDN9YYD3MNF",
+          "hotelBooked": false,
+          "hotelBookingNote": "3 nights; June 4 - June 7th",
+          "hotelConfirmationNumber": "80375243",
+          "hotelTotalCost": 864.65,
+          "flightsBooked": false,
+          "flightTotalCost": 0,
+          "flightInfoOutbound": "SJC/SFO → DEN",
+          "flightInfoReturn": "DEN → SJC/SFO",
+          "notes": ""
+        },
+        {
+          "id": "att-2",
+          "name": "Vickram Rajendran",
+          "team": "Onroad/Perception",
+          "dates": "",
+          "hotelNights": 3,
+          "confirmed": "checking",
+          "ieeeMemberNumber": "bad72efdcd",
+          "tshirtSize": "S",
+          "foodPreference": "N/A",
+          "conferenceRegistered": false,
+          "conferenceConfirmationNumber": "",
+          "hotelBooked": false,
+          "hotelBookingNote": "3 nights; June 4 - June 7th",
+          "hotelConfirmationNumber": "80375243",
+          "hotelTotalCost": 864.65,
+          "flightsBooked": false,
+          "flightTotalCost": 0,
+          "flightInfoOutbound": "SJC/SFO → DEN",
+          "flightInfoReturn": "DEN → SJC/SFO",
+          "notes": ""
+        },
+        {
+          "id": "att-3",
+          "name": "Sean Roelofs",
+          "team": "Onroad/Perception",
+          "dates": "",
+          "hotelNights": 3,
+          "confirmed": "checking",
+          "ieeeMemberNumber": "101635170",
+          "tshirtSize": "L",
+          "foodPreference": "Vegetarian",
+          "conferenceRegistered": false,
+          "conferenceConfirmationNumber": "",
+          "hotelBooked": false,
+          "hotelBookingNote": "",
+          "hotelConfirmationNumber": "80375243",
+          "hotelTotalCost": 864.65,
+          "flightsBooked": false,
+          "flightTotalCost": 0,
+          "flightInfoOutbound": "",
+          "flightInfoReturn": "",
+          "notes": ""
+        },
+        {
+          "id": "att-4",
+          "name": "Bradley Collicott",
+          "team": "Offroad",
+          "dates": "",
+          "hotelNights": 3,
+          "confirmed": "checking",
+          "ieeeMemberNumber": "101635134",
+          "tshirtSize": "L",
+          "foodPreference": "N/A",
+          "conferenceRegistered": false,
+          "conferenceConfirmationNumber": "",
+          "hotelBooked": false,
+          "hotelBookingNote": "",
+          "hotelConfirmationNumber": "80375243",
+          "hotelTotalCost": 864.65,
+          "flightsBooked": false,
+          "flightTotalCost": 0,
+          "flightInfoOutbound": "",
+          "flightInfoReturn": "",
+          "notes": ""
+        },
+        {
+          "id": "att-5",
+          "name": "Wei Zhan",
+          "team": "AI Research",
+          "dates": "",
+          "hotelNights": 3,
+          "confirmed": "confirmed",
+          "ieeeMemberNumber": "94030749",
+          "tshirtSize": "M",
+          "foodPreference": "N/A",
+          "conferenceRegistered": false,
+          "conferenceConfirmationNumber": "",
+          "hotelBooked": false,
+          "hotelBookingNote": "",
+          "hotelConfirmationNumber": "80375243",
+          "hotelTotalCost": 864.65,
+          "flightsBooked": false,
+          "flightTotalCost": 0,
+          "flightInfoOutbound": "",
+          "flightInfoReturn": "",
+          "notes": ""
+        },
+        {
+          "id": "att-6",
+          "name": "Yihan Hu",
+          "team": "AI Research/E2E",
+          "dates": "",
+          "hotelNights": 3,
+          "confirmed": "confirmed",
+          "ieeeMemberNumber": "100213103",
+          "tshirtSize": "",
+          "foodPreference": "N/A",
+          "conferenceRegistered": false,
+          "conferenceConfirmationNumber": "",
+          "hotelBooked": false,
+          "hotelBookingNote": "",
+          "hotelConfirmationNumber": "80375243",
+          "hotelTotalCost": 864.65,
+          "flightsBooked": false,
+          "flightTotalCost": 0,
+          "flightInfoOutbound": "",
+          "flightInfoReturn": "",
+          "notes": ""
+        },
+        {
+          "id": "att-7",
+          "name": "Shubh Gupta",
+          "team": "AI Research",
+          "dates": "",
+          "hotelNights": 3,
+          "confirmed": "checking",
+          "ieeeMemberNumber": "101635129",
+          "tshirtSize": "L",
+          "foodPreference": "Vegan",
+          "conferenceRegistered": false,
+          "conferenceConfirmationNumber": "",
+          "hotelBooked": false,
+          "hotelBookingNote": "",
+          "hotelConfirmationNumber": "80375243",
+          "hotelTotalCost": 864.65,
+          "flightsBooked": false,
+          "flightTotalCost": 0,
+          "flightInfoOutbound": "",
+          "flightInfoReturn": "",
+          "notes": ""
+        }
+      ],
+      "booth": {
+        "size": "10x10",
+        "design": {
+          "status": "not_started",
+          "deadline": "2026-05-11",
+          "notes": "Booth design must be submitted by May 11, 2026. Coordinate with Marketing/Design team. Should reflect the new Applied Intuition rebrand and Physical AI positioning."
+        },
+        "materials": [
+          { "item": "Demo laptop(s)", "packed": false },
+          { "item": "Booth banner / backdrop", "packed": false },
+          { "item": "Tablecloth with branding", "packed": false },
+          { "item": "Booth flyers", "packed": false },
+          { "item": "Breakfast invite cards", "packed": false },
+          { "item": "Swag items", "packed": false },
+          { "item": "Business cards", "packed": false },
+          { "item": "Lead capture tablet", "packed": false },
+          { "item": "Scanning app device", "packed": false },
+          { "item": "Extension cords / power strips", "packed": false },
+          { "item": "Signage / wayfinding", "packed": false },
+          { "item": "Banners", "packed": false }
+        ],
+        "shipping": {
+          "status": "not_started",
+          "deadline": "2026-05-27",
+          "carrier": "Freeman",
+          "tracking": ""
+        },
+        "shifts": [
+          {
+            "date": "Friday, June 5, 2026",
+            "slots": [
+              { "time": "10:00 AM - 12:30 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] },
+              { "time": "12:30 PM - 3:00 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] },
+              { "time": "3:00 PM - 6:00 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] }
+            ]
+          },
+          {
+            "date": "Saturday, June 6, 2026",
+            "slots": [
+              { "time": "8:30 AM - 11:00 AM", "isSpecialEvent": true, "specialEventLabel": "BREAKFAST", "boothers": ["", "", "", ""] },
+              { "time": "10:00 AM - 12:30 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] },
+              { "time": "12:30 PM - 3:00 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] },
+              { "time": "3:00 PM - 6:00 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] }
+            ]
+          },
+          {
+            "date": "Sunday, June 7, 2026",
+            "slots": [
+              { "time": "8:30 AM - 11:00 AM", "isSpecialEvent": true, "specialEventLabel": "BREAKFAST", "boothers": ["", "", "", ""] },
+              { "time": "10:00 AM - 12:30 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] },
+              { "time": "12:30 PM - 3:00 PM", "isSpecialEvent": false, "specialEventLabel": "", "boothers": ["", "", "", ""] }
+            ]
+          }
+        ]
+      },
+      "privateEvent": {
+        "venue": "",
+        "capacity": "50",
+        "catering": "",
+        "invitesSent": false,
+        "inviteDeadline": "2026-05-19",
+        "rsvpCount": 0,
+        "notes": "Two breakfast events:\n- Day 1: Saturday, June 6, 2026 — 8:30 AM to 11:00 AM\n- Day 2: Sunday, June 7, 2026 — 8:30 AM to 11:00 AM\n\nFormat: Hosted breakfast with curated guest list. Goal is intimate setting for high-quality research talent conversations. Digital invites go out starting May 19."
+      },
+      "candidates": [],
+      "budget": {
+        "headcount": {
+          "recruiting": 1,
+          "research": 4,
+          "engineering": 2,
+          "marketing": 0,
+          "total": 7
+        },
+        "lineItems": [
+          { "dateOfSpend": "3/4/2026", "item": "Hotel Room for 1 person/night @ Hotel in Denver", "source": "Ramp Card", "costPerUnit": 300, "quantity": 28, "totalCost": 8400, "actualSpend": 6916.40, "notes": "Quantity is # of people x # of nights; Respective attendee's team is cost center" },
+          { "dateOfSpend": "", "item": "Flight SJC/SFO <> DEN for 1 person roundtrip", "source": "Navan", "costPerUnit": 450, "quantity": 8, "totalCost": 3600, "actualSpend": 0, "notes": "Quantity is # of people; Respective attendee's team is cost center" },
+          { "dateOfSpend": "", "item": "Local Transportation DEN <> Downtown Denver roundtrip", "source": "Ramp Reimbursement", "costPerUnit": 80, "quantity": 8, "totalCost": 640, "actualSpend": 0, "notes": "Quantity is # of people; Respective attendee's team is cost center" },
+          { "dateOfSpend": "", "item": "Meals and Incidentals per person", "source": "Ramp Reimbursement", "costPerUnit": 300, "quantity": 8, "totalCost": 2400, "actualSpend": 0, "notes": "Quantity is # of people x $60/person/day; Respective attendee's team is cost center" },
+          { "dateOfSpend": "", "item": "CVPR Booth Space Registration", "source": "Ramp Card", "costPerUnit": 55, "quantity": 1, "totalCost": 5500, "actualSpend": 0, "notes": "$/sq ft; 50/50 split between Recruiting/Marketing" },
+          { "dateOfSpend": "2/24/2026", "item": "CVPR Conference Sponsorship (Silver)", "source": "Ramp Card", "costPerUnit": 0, "quantity": 1, "totalCost": 7000, "actualSpend": 7000, "notes": "Silver; Research pays" },
+          { "dateOfSpend": "", "item": "CVPR Conference Registration (Full Passport)", "source": "Ramp Card", "costPerUnit": 750, "quantity": 7, "totalCost": 5250, "actualSpend": 0, "notes": "Respective attendee's team is cost center" },
+          { "dateOfSpend": "4/7/2026", "item": "10x10 Booth Build", "source": "Freeman", "costPerUnit": 0, "quantity": 1, "totalCost": 25000, "actualSpend": 8854.25, "notes": "50/50 split between Recruiting/Marketing; 10 x 10 Booth includes TV" },
+          { "dateOfSpend": "", "item": "10x10 Booth Build A/V", "source": "Freeman", "costPerUnit": 0, "quantity": 1, "totalCost": 5000, "actualSpend": 0, "notes": "" },
+          { "dateOfSpend": "", "item": "Booth Exhibit Staff Registration", "source": "Ramp Card", "costPerUnit": 75, "quantity": 1, "totalCost": 75, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; The contact at our booth build vendor setting up; likely Freeman" },
+          { "dateOfSpend": "", "item": "Booth Badge Scanners", "source": "Freeman", "costPerUnit": 0, "quantity": 6, "totalCost": 874.47, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; $359 for first license, $99 for second, $458 total" },
+          { "dateOfSpend": "", "item": "Booth Fliers", "source": "Ramp Card", "costPerUnit": 0, "quantity": 1000, "totalCost": 336, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; Booth fliers quote from Dynamite Digital for a 5 x 7 card; this includes tax and shipping" },
+          { "dateOfSpend": "", "item": "Breakfast Event Invitations", "source": "Ramp Card", "costPerUnit": 0, "quantity": 300, "totalCost": 70, "actualSpend": 0, "notes": "Recruiting pays; Breakfast event invitations quote from FedEx; this includes tax, would have to pick up" },
+          { "dateOfSpend": "", "item": "Breakfast Event Venue", "source": "Hotel Venue", "costPerUnit": 680, "quantity": 2, "totalCost": 1360, "actualSpend": 0, "notes": "Recruiting pays; Quantity is for 2 half-days" },
+          { "dateOfSpend": "", "item": "Breakfast Event Food Order", "source": "Hotel Venue", "costPerUnit": 70, "quantity": 80, "totalCost": 5600, "actualSpend": 0, "notes": "Recruiting pays; Quantity is for 40 people for 2 breakfast events, so 80 people total" },
+          { "dateOfSpend": "", "item": "Swag: TBD (waiting on Marketing rebrand, but likely tote bags)", "source": "Ramp Card", "costPerUnit": 0, "quantity": 600, "totalCost": 10000, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; Swag has not be determined yet, this is an estimate from previous swag (foldable tote bags)" },
+          { "dateOfSpend": "", "item": "Swag: Applied stickers", "source": "Ramp Card", "costPerUnit": 0.27, "quantity": 1000, "totalCost": 271, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing; Swag has not be determined yet, this is an estimate from previous stickers" },
+          { "dateOfSpend": "", "item": "General incidentals, taxes, fees, shipping costs", "source": "", "costPerUnit": 10000, "quantity": 1, "totalCost": 10000, "actualSpend": 0, "notes": "Buffer" }
+        ],
+        "summary": [
+          { "category": "Cost per person", "projectedCost": 2780, "actualSpend": 0, "notes": "This includes: Hotel, flights, transportation, meals/incidentals, conference registration. Paid for by respective cost center of each attendee." },
+          { "category": "Conference Sponsorship", "projectedCost": 7000, "actualSpend": 7000, "notes": "Research pays" },
+          { "category": "Breakfast Event", "projectedCost": 7030, "actualSpend": 0, "notes": "Recruiting pays" },
+          { "category": "Swag", "projectedCost": 10271, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing" },
+          { "category": "Booth", "projectedCost": 31785.47, "actualSpend": 0, "notes": "50/50 split between Recruiting/Marketing" },
+          { "category": "Buffer Placeholder", "projectedCost": 10000, "actualSpend": 0, "notes": "" }
+        ],
+        "teamSpend": [
+          { "owner": "Wei Zhan", "label": "Total Research Spend", "projectedCost": 18120, "actualSpend": 0, "notes": "Conference Sponsorship" },
+          { "owner": "Vickram Rajendran", "label": "Total Eng Spend", "projectedCost": 5560, "actualSpend": 0, "notes": "Cost to send each attendee (flights, hotels, transportation, food, conference registration)" },
+          { "owner": "Eitan Sheer", "label": "Total Recruiting Spend", "projectedCost": 30838.24, "actualSpend": 0, "notes": "Breakfast event, 50/50 split with Marketing on conference booth and swag" },
+          { "owner": "Karl Heiselman", "label": "Total Marketing Spend", "projectedCost": 21028.24, "actualSpend": 0, "notes": "50/50 split with Recruiting on conference booth and swag" },
+          { "owner": "", "label": "Buffer Placeholder", "projectedCost": 10000, "actualSpend": 0, "notes": "" }
+        ]
+      },
+      "actionItems": {
+        "_note": "See default_action_items_template above — CVPR 2026 would be initialized with those defaults, then customized with CVPR-specific dates and DRIs."
+      }
+    }
+  ]
+}
